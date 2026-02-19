@@ -7,7 +7,6 @@ import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
-import { withZephyrTanstackStart } from 'vite-plugin-tanstack-start-zephyr';
 
 
 const config = defineConfig({
@@ -18,7 +17,6 @@ const config = defineConfig({
     tailwindcss(),
     tanstackStart(),
     viteReact(),
-    withZephyrTanstackStart()
   ],
 })
 
