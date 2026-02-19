@@ -1,0 +1,285 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{geometry}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+
+\geometry{margin=2.5cm}
+\setlist[itemize]{leftmargin=1.2cm}
+\setlist[enumerate]{leftmargin=1.2cm}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+
+\input{../docs/requirements/mermaid-macros.tex}
+
+\title{Documento de Análise e Levantamento de Requisitos\\Vitas Odonto}
+\author{Produto, Engenharia e Operações}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Objetivo}
+Congelar o escopo funcional e não funcional da versão 1.0 do módulo Odonto para entrada em \texttt{Ready for Build}, garantindo rastreabilidade entre dor operacional, requisitos e critérios de aceite.
+
+\section{Escopo do Produto}
+\subsection{Escopo funcional}
+\begin{itemize}
+  \item Agenda odontológica com autoagendamento e validação de disponibilidade.
+  \item Confirmação e lembrete automáticos por WhatsApp/SMS.
+  \item Prontuário odontológico digital com assinaturas eletrônicas.
+  \item Fechamento de atendimento com status administrativo e histórico mínimo.
+  \item Controle de funcionalidades por plano e perfil.
+\end{itemize}
+
+\subsection{Fora de escopo}
+\begin{itemize}
+  \item Teleconsulta em vídeo.
+  \item Emissão fiscal completa (NFS-e).
+  \item Crédito/financiamento de tratamento.
+  \item Integrações com maquininha de cartão.
+\end{itemize}
+
+\section{Planos, Pacotes ou Modalidades}
+\subsection{Planos previstos}
+\begin{itemize}
+  \item Consultório — agenda, prontuário e fechamento básico de atendimento.
+  \item Clínicas — inclui automações de confirmação e indicadores operacionais.
+  \item Rede — inclui governança multiunidade e políticas avançadas.
+\end{itemize}
+
+\subsection{Diretrizes por plano}
+\begin{itemize}
+  \item Regras de restrição devem ser aplicadas no backend.
+  \item Interface não deve ser o único mecanismo de bloqueio.
+\end{itemize}
+
+\section{Perfis e Stakeholders}
+\begin{itemize}
+  \item Paciente — realiza agendamento e confirma presença.
+  \item Recepção — opera agenda e acompanha respostas de confirmação.
+  \item Dentista — registra evolução e documentos clínicos.
+  \item Administrativo — acompanha fechamento de atendimentos e indicadores operacionais.
+  \item Gestor — monitora faltas, ocupação e eficiência operacional.
+\end{itemize}
+
+\section{Premissas e Restrições}
+\begin{itemize}
+  \item A agenda deve respeitar regras de disponibilidade por profissional e tipo de procedimento.
+  \item O fechamento de atendimento não depende de integrações financeiras para concluir o fluxo clínico.
+  \item Mensageria depende de provedor externo com SLA contratual.
+  \item Dados clínicos devem obedecer segregação por clínica e LGPD.
+\end{itemize}
+
+\section{Arquitetura e Tecnologias Sugeridas}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{2.6cm}|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}p{5.6cm}|}
+\hline
+\textbf{Camada} & \textbf{Tecnologias} & \textbf{Justificativa} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Camada} & \textbf{Tecnologias} & \textbf{Justificativa} \\
+\hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+Frontend & Next.js e React & Interface web responsiva para recepção e dentista com fluxo rápido de agenda. \\
+\hline
+Backend & Node.js LTS e NestJS & APIs modulares para agenda, prontuário, fechamento de atendimento e integrações externas. \\
+\hline
+Dados & PostgreSQL e Redis & Persistência transacional e cache para leitura de agenda e disponibilidade. \\
+\hline
+Infra/Obs. & Docker, CI/CD, OpenTelemetry e Grafana & Operação observável com deploy padronizado e monitoramento contínuo. \\
+\hline
+\end{longtable}
+
+\section{Modelo de Domínio}
+\begin{itemize}
+  \item Consulta pertence a um paciente, um profissional e uma clínica.
+  \item Prontuário registra evolução por consulta e documentos vinculados.
+  \item Atendimento concluído possui status administrativo de fechamento.
+\end{itemize}
+
+\section{Requisitos Funcionais}
+\subsection{Catálogo de requisitos}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1.4cm}|>{\raggedright\arraybackslash}p{6.0cm}|>{\raggedright\arraybackslash}p{2.0cm}|>{\raggedright\arraybackslash}p{2.3cm}|}
+\hline
+\textbf{ID} & \textbf{Descrição} & \textbf{Prior.} & \textbf{Módulo} \\
+\hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{Descrição} & \textbf{Prior.} & \textbf{Módulo} \\
+\hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+RF-01 & Permitir autoagendamento com validação de disponibilidade por profissional e tipo de atendimento. & Alta & Agenda \\
+\hline
+RF-02 & Permitir confirmação e lembretes automáticos por WhatsApp/SMS com atualização de status da consulta. & Alta & Agenda \\
+\hline
+RF-03 & Permitir registro de prontuário odontológico digital com assinatura eletrônica de documentos obrigatórios. & Alta & Prontuário \\
+\hline
+RF-04 & Permitir fechamento administrativo do atendimento concluído sem depender de confirmações externas. & Alta & Atendimento \\
+\hline
+RF-05 & Permitir bloqueio de funcionalidades por plano contratado com validação no backend. & Alta & Planos \\
+\hline
+RF-06 & Permitir remarcação e cancelamento com aplicação de regras de antecedência por clínica. & Média & Agenda \\
+\hline
+RF-07 & Exibir painel operacional com taxa de ocupação, faltas e confirmações por período. & Média & Gestão \\
+\hline
+RF-08 & Registrar trilha de auditoria para alterações críticas em agenda, prontuário e fechamento de atendimento. & Alta & Auditoria \\
+\hline
+\end{longtable}
+
+\section{Requisitos Não Funcionais}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1.4cm}|>{\raggedright\arraybackslash}p{8.0cm}|>{\raggedright\arraybackslash}p{2.0cm}|}
+\hline
+\textbf{ID} & \textbf{Descrição} & \textbf{Prior.} \\
+\hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{Descrição} & \textbf{Prior.} \\
+\hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+RNF-01 & Disponibilidade mensal mínima de 99,5\% para agenda, prontuário e fechamento de atendimento. & Alta \\
+\hline
+RNF-02 & Tempo de resposta inferior a 2 segundos no percentil 95 para agenda e prontuário. & Alta \\
+\hline
+RNF-03 & Segregação lógica de dados por clínica e empresa, sem vazamento entre contextos. & Alta \\
+\hline
+RNF-04 & Criptografia de dados em trânsito (TLS) e em repouso para dados sensíveis. & Alta \\
+\hline
+RNF-05 & Auditoria imutável para eventos críticos com retenção mínima de 5 anos. & Alta \\
+\hline
+RNF-06 & Proteção contra abuso em endpoints públicos de confirmação com rate limit e bloqueio progressivo. & Média \\
+\hline
+\end{longtable}
+
+\section{Regras de Negócio}
+\begin{itemize}
+  \item RN-01: Uma consulta só pode ser confirmada se houver vínculo ativo paciente-clínica.
+  \item RN-02: Remarcação deve respeitar janela mínima de antecedência por política da clínica.
+  \item RN-03: O fechamento administrativo do atendimento deve ocorrer sem validações externas.
+  \item RN-04: Assinatura de documento clínico é obrigatória para finalizar determinados tipos de atendimento.
+\end{itemize}
+
+\section{Casos de Uso}
+\subsection*{CU-01 — Agendar e confirmar consulta}
+\textbf{Ator principal:} Paciente\\
+\textbf{Fluxo resumido:}
+\begin{enumerate}
+  \item Paciente seleciona profissional e horário disponível.
+  \item Sistema registra consulta e dispara confirmação automática.
+  \item Paciente confirma e consulta segue para atendimento.
+\end{enumerate}
+
+\subsection*{CU-02 — Registrar atendimento e concluir fechamento}
+\textbf{Ator principal:} Dentista/Recepção\\
+\textbf{Fluxo resumido:}
+\begin{enumerate}
+  \item Dentista registra evolução e documentos do atendimento.
+  \item Sistema registra o fechamento administrativo do atendimento.
+  \item Atendimento é concluído sem bloqueio por etapas financeiras.
+\end{enumerate}
+
+\section{Fluxo Principal (Opcional)}
+\begin{figure}[htbp]
+  \centering
+  \MermaidTikzStyles
+  \resizebox{\MermaidMaxWidth}{!}{%
+    \begin{tikzpicture}[node distance=8mm and 10mm,>=Latex]
+      \node[term, small] (a) {Início};
+      \node[box, small, below=of a] (b) {Paciente inicia autoagendamento (RF-01)};
+      \node[decision, small, below=10mm of b] (c) {Horário disponível?};
+      \node[box, small, below left=10mm and 8mm of c] (d) {Exibir alternativas (RF-01)};
+      \node[box, small, below right=10mm and 8mm of c] (e) {Registrar consulta (RF-01)};
+      \node[box, small, below=of e] (f) {Disparar confirmação automática (RF-02)};
+      \node[decision, small, below=10mm of f] (g) {Paciente confirmou?};
+      \node[box, small, below left=10mm and 8mm of g] (h) {Remarcar ou cancelar (RF-06)};
+      \node[box, small, below right=10mm and 8mm of g] (i) {Atender e registrar prontuário (RF-03)};
+      \node[box, small, below=of i] (j) {Registrar fechamento do atendimento (RF-04)};
+      \node[term, small, below=12mm of j] (k) {Fim};
+
+      \draw[line] (a) -- (b);
+      \draw[line] (b) -- (c);
+      \draw[line] (c) -- node[left, small] {Não} (d);
+      \draw[line] (c) -- node[right, small] {Sim} (e);
+      \draw[line] (e) -- (f);
+      \draw[line] (f) -- (g);
+      \draw[line] (g) -- node[left, small] {Não} (h);
+      \draw[line] (g) -- node[right, small] {Sim} (i);
+      \draw[line] (i) -- (j);
+      \draw[line] (d) |- (h);
+      \draw[line] (h) |- (k);
+      \draw[line] (j) -- (k);
+    \end{tikzpicture}%
+  }
+  \caption{Fluxo principal do usuário no Odonto.}
+\end{figure}
+
+\section{Critérios de Aceitação}
+\subsection*{CA-01 (RF-01)}
+\textbf{Dado} um horário disponível na agenda\\
+\textbf{Quando} o paciente concluir o autoagendamento\\
+\textbf{Então} o sistema deve registrar a consulta sem conflito de disponibilidade.
+
+\subsection*{CA-02 (RF-02)}
+\textbf{Dado} uma consulta agendada\\
+\textbf{Quando} o horário de confirmação for atingido\\
+\textbf{Então} o sistema deve enviar mensagem automática e atualizar o status com base na resposta.
+
+\subsection*{CA-03 (RF-04)}
+\textbf{Dado} um atendimento clínico concluído\\
+\textbf{Quando} a recepção finalizar o fechamento administrativo\\
+\textbf{Então} o sistema deve registrar o fechamento sem exigir validações financeiras externas.
+
+\section{Priorização}
+\subsection*{MVP}
+\begin{itemize}
+  \item RF-01, RF-02, RF-03, RF-04 e RF-05.
+  \item RNF-01, RNF-02, RNF-03 e RNF-04.
+\end{itemize}
+
+\subsection*{Pós-MVP}
+\begin{itemize}
+  \item RF-06, RF-07 e RF-08.
+  \item RNF-05 e RNF-06.
+\end{itemize}
+
+\section{Riscos e Dependências}
+\begin{itemize}
+  \item Dependência de SLA de provedores de mensagem.
+  \item Risco de dados inconsistentes de agenda em clínicas com regras não padronizadas.
+  \item Dependência de treinamento operacional para adoção do novo fluxo.
+\end{itemize}
+
+\section{Pendências para Refinamento}
+\begin{itemize}
+  \item Definir política única de antecedência para remarcações por tipo de clínica.
+  \item Fechar catálogo oficial de documentos com assinatura obrigatória.
+\end{itemize}
+
+\section{Conclusão}
+Este documento congela o escopo da versão 1.0 do Odonto com trilha direta entre dor operacional, requisitos e critérios de aceite, habilitando a transição para build.
+
+\end{document}

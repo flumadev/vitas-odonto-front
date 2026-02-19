@@ -1,0 +1,217 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{geometry}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+
+\geometry{margin=2.5cm}
+\setlist[itemize]{leftmargin=1.2cm}
+\setlist[enumerate]{leftmargin=1.2cm}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+
+\input{../docs/requirements/mermaid-macros.tex}
+
+\title{Levantamento de Requisitos Técnicos\\Vitas Odonto}
+\author{Arquitetura, Engenharia e Segurança}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Objetivo Técnico}
+Definir tecnologias oficiais e requisitos técnicos para implementação do módulo Odonto em produção com previsibilidade operacional, segurança e observabilidade.
+
+\section{Escopo Técnico}
+\subsection{Incluído}
+\begin{itemize}
+  \item Frontend web de agenda e operação clínica.
+  \item APIs para agenda, prontuário, comunicação e fechamento de atendimento.
+  \item Persistência transacional, cache, filas e auditoria.
+  \item Integrações com provedor de mensagem.
+\end{itemize}
+
+\subsection{Fora de escopo}
+\begin{itemize}
+  \item Aplicativo mobile nativo.
+  \item Multi-região ativa-ativa na primeira versão.
+  \item Substituição de sistemas legados externos à plataforma Vitas.
+\end{itemize}
+
+\section{Princípios de Arquitetura}
+\begin{itemize}
+  \item Segurança por padrão em todos os endpoints críticos.
+  \item Serviços modulares por domínio (agenda, clínico e administrativo).
+  \item Processamento assíncrono para eventos de confirmação e fechamento de atendimento.
+  \item Observabilidade mandatória para suporte e operação.
+\end{itemize}
+
+\section{Matriz de Tecnologias Oficiais}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{2.0cm}|>{\raggedright\arraybackslash}p{3.2cm}|>{\raggedright\arraybackslash}p{2.0cm}|>{\raggedright\arraybackslash}p{4.6cm}|}
+\hline
+\textbf{Camada} & \textbf{Tecnologia} & \textbf{Versão} & \textbf{Uso} \\
+\hline
+\endfirsthead
+\hline
+\textbf{Camada} & \textbf{Tecnologia} & \textbf{Versão} & \textbf{Uso} \\
+\hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+Frontend & Next.js + React & LTS & Interface de agenda e operação clínica. \\
+\hline
+Backend & Node.js + NestJS & LTS & APIs de agenda, prontuário, fechamento e integrações. \\
+\hline
+Dados & PostgreSQL & 16+ & Persistência de consultas, prontuário e dados administrativos. \\
+\hline
+Cache/Fila & Redis + BullMQ & 7+ & Fila de notificações e eventos de fechamento. \\
+\hline
+Identidade & Keycloak (OIDC) & Estável & Autenticação, autorização e MFA. \\
+\hline
+Obs. & OpenTelemetry + Grafana stack & Estável & Logs, métricas, traces e alertas. \\
+\hline
+\end{longtable}
+
+\section{Requisitos Técnicos Funcionais}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1.4cm}|>{\raggedright\arraybackslash}p{6.2cm}|>{\raggedright\arraybackslash}p{2.0cm}|>{\raggedright\arraybackslash}p{2.3cm}|}
+\hline
+\textbf{ID} & \textbf{Descrição} & \textbf{Prior.} & \textbf{Módulo} \\
+\hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{Descrição} & \textbf{Prior.} & \textbf{Módulo} \\
+\hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+RT-01 & Implementar frontend em Next.js com componentes de agenda e prontuário responsivos. & Alta & Frontend \\
+\hline
+RT-02 & Expor APIs NestJS com versionamento para agenda, confirmação e fechamento de atendimento. & Alta & Backend \\
+\hline
+RT-03 & Persistir dados transacionais em PostgreSQL com migrações versionadas. & Alta & Dados \\
+\hline
+RT-04 & Processar confirmações e eventos de fechamento por fila assíncrona com retentativas. & Alta & Integração \\
+\hline
+RT-05 & Integrar autenticação OIDC com controle de acesso por papel e clínica. & Alta & Segurança \\
+\hline
+RT-06 & Emitir telemetria completa para endpoints críticos de agenda e fechamento. & Alta & Observab. \\
+\hline
+RT-07 & Garantir idempotência em eventos de fechamento de atendimento por chave de negócio. & Alta & Atendimento \\
+\hline
+\end{longtable}
+
+\section{Requisitos Não Funcionais Técnicos}
+\begin{longtable}{|>{\raggedright\arraybackslash}p{1.4cm}|>{\raggedright\arraybackslash}p{8.0cm}|>{\raggedright\arraybackslash}p{2.0cm}|}
+\hline
+\textbf{ID} & \textbf{Descrição} & \textbf{Prior.} \\
+\hline
+\endfirsthead
+\hline
+\textbf{ID} & \textbf{Descrição} & \textbf{Prior.} \\
+\hline
+\endhead
+\hline
+\endfoot
+\hline
+\endlastfoot
+RNFT-01 & Disponibilidade mensal mínima de 99,5\% para serviços de agenda e fechamento de atendimento. & Alta \\
+\hline
+RNFT-02 & Resposta no percentil 95 inferior a 2 segundos para operações críticas de agenda. & Alta \\
+\hline
+RNFT-03 & Criptografia de dados em trânsito e em repouso para dados sensíveis. & Alta \\
+\hline
+RNFT-04 & Auditoria imutável para alterações críticas de consulta, prontuário e fechamento. & Alta \\
+\hline
+RNFT-05 & RPO máximo de 15 minutos e RTO máximo de 2 horas para serviços críticos. & Alta \\
+\hline
+RNFT-06 & Proteção contra abuso em endpoints de confirmação com rate limit e bloqueio progressivo. & Média \\
+\hline
+\end{longtable}
+
+\section{Fluxo Principal (Opcional)}
+\begin{figure}[htbp]
+  \centering
+  \MermaidTikzStyles
+  \resizebox{\MermaidMaxWidth}{!}{%
+    \begin{tikzpicture}[node distance=8mm and 10mm,>=Latex]
+      \node[term, small] (a) {Início};
+      \node[box, small, below=of a] (b) {Frontend envia solicitação de agendamento (RT-01)};
+      \node[box, small, below=of b] (c) {API valida regras e disponibilidade (RT-02)};
+      \node[decision, small, below=10mm of c] (d) {Validação aprovada?};
+      \node[box, small, below left=10mm and 8mm of d] (e) {Retornar erro de regra e auditar (RT-06)};
+      \node[box, small, below right=10mm and 8mm of d] (f) {Persistir consulta e publicar evento (RT-03, RT-04)};
+      \node[box, small, below=of f] (g) {Disparar confirmação e rastrear retorno (RT-04)};
+      \node[decision, small, below=10mm of g] (h) {Fechamento administrativo validado?};
+      \node[box, small, below left=10mm and 8mm of h] (i) {Manter atendimento pendente de fechamento};
+      \node[box, small, below right=10mm and 8mm of h] (j) {Concluir fechamento idempotente e auditar (RT-07)};
+      \node[term, small, below=12mm of j] (k) {Fim};
+
+      \draw[line] (a) -- (b);
+      \draw[line] (b) -- (c);
+      \draw[line] (c) -- (d);
+      \draw[line] (d) -- node[left, small] {Não} (e);
+      \draw[line] (d) -- node[right, small] {Sim} (f);
+      \draw[line] (f) -- (g);
+      \draw[line] (g) -- (h);
+      \draw[line] (h) -- node[left, small] {Não} (i);
+      \draw[line] (h) -- node[right, small] {Sim} (j);
+      \draw[line] (e) |- (k);
+      \draw[line] (i) |- (k);
+      \draw[line] (j) -- (k);
+    \end{tikzpicture}%
+  }
+  \caption{Fluxo técnico principal de agendamento ao fechamento administrativo no Odonto.}
+\end{figure}
+
+\section{Critérios de Aceitação Técnicos}
+\subsection*{CA-T01 (RT-02)}
+\textbf{Dado} uma requisição de agendamento válida\\
+\textbf{Quando} a API processar a solicitação\\
+\textbf{Então} deve validar regras de disponibilidade sem conflito de agenda.
+
+\subsection*{CA-T02 (RT-04)}
+\textbf{Dado} um evento de confirmação pendente\\
+\textbf{Quando} a fila executar o processamento\\
+\textbf{Então} o envio deve ser retentado conforme política e registrado em observabilidade.
+
+\subsection*{CA-T03 (RT-07)}
+\textbf{Dado} um evento duplicado de fechamento administrativo\\
+\textbf{Quando} o sistema processar a conclusão\\
+\textbf{Então} não deve haver duplicidade de fechamento.
+
+\section{Plano de Entrega Técnica}
+\subsection*{Fase 1}
+\begin{itemize}
+  \item RT-01, RT-02, RT-03 e RT-05.
+\end{itemize}
+
+\subsection*{Fase 2}
+\begin{itemize}
+  \item RT-04, RT-06 e RT-07.
+\end{itemize}
+
+\section{Riscos Técnicos e Dependências}
+\begin{itemize}
+  \item Dependência de SLA do provedor de mensagem para confirmações automáticas.
+  \item Risco de latência sob pico de uso sem dimensionamento de fila.
+\end{itemize}
+
+\section{Conclusão}
+Este levantamento técnico define a base para implementação e operação do Odonto com critérios objetivos para build e validação técnica.
+
+\end{document}

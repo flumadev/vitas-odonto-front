@@ -1,0 +1,179 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+
+\geometry{margin=2.5cm}
+\setlist[itemize]{leftmargin=1.2cm}
+\setlist[enumerate]{leftmargin=1.2cm}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=blue
+}
+
+\input{../docs/requirements/mermaid-macros.tex}
+
+\title{Levantamento Lean de Requisitos\\Vitas Odonto}
+\author{Produto e Engenharia}
+\date{\today}
+
+\makeatletter
+\renewcommand{\maketitle}{
+  \begin{titlepage}
+    \centering
+    \vspace*{\fill}
+    {\LARGE\bfseries \@title\par}
+    \vspace{1.2cm}
+    {\large \@author\par}
+    \vspace{0.8cm}
+    {\large \@date\par}
+    \vspace*{\fill}
+  \end{titlepage}
+}
+\makeatother
+
+\begin{document}
+\hypersetup{pageanchor=false}
+\maketitle
+\hypersetup{pageanchor=true}
+\tableofcontents
+\newpage
+
+\section{Contexto e Problema}
+Hoje, o módulo Odonto opera com etapas críticas em ferramentas separadas (agenda, confirmação, prontuário e cobrança), sem um fluxo único de ponta a ponta.
+Sem essa integração, a clínica perde previsibilidade operacional: há mais faltas, mais esforço manual da recepção e maior tempo até o fechamento financeiro.
+
+\section{Objetivo do MVP}
+Validar um fluxo único e operacional para o atendimento odontológico, cobrindo agendamento, confirmação e cobrança no mesmo processo.
+
+Metas mensuráveis para até 90 dias após o go-live:
+\begin{itemize}
+  \item Reduzir em 20\% a taxa de não comparecimento em consultas confirmáveis.
+  \item Atingir pelo menos 80\% de confirmações automáticas em consultas elegíveis (WhatsApp ou SMS).
+  \item Atingir pelo menos 90\% de baixas automáticas de Pix em até 5 minutos após confirmação do pagamento.
+\end{itemize}
+
+\section{Usuários e Stakeholders}
+\begin{itemize}
+  \item Paciente: precisa agendar e confirmar consulta com rapidez e clareza.
+  \item Recepção: precisa reduzir confirmação e remarcação manual.
+  \item Dentista: precisa manter evolução clínica e documentos com segurança jurídica.
+  \item Financeiro: precisa reduzir conciliação manual de cobrança.
+  \item Gestor da clínica: precisa controlar eficiência operacional e aderência por plano.
+\end{itemize}
+
+\section{Hipóteses}
+\begin{itemize}
+  \item Hipótese de valor: um fluxo único reduz faltas e retrabalho da operação.
+  \item Hipótese de viabilidade: integração com WhatsApp/SMS e Pix é suficiente para validar o MVP sem congelar arquitetura.
+\end{itemize}
+
+\section{Escopo Mínimo}
+\subsection*{Incluído}
+\begin{itemize}
+  \item Autoagendamento 24/7 por profissional e tipo de atendimento.
+  \item Confirmação e lembrete automáticos com atualização de status na agenda.
+  \item Prontuário digital odontológico com assinatura eletrônica de documentos essenciais.
+  \item Cobrança Pix com baixa automática após confirmação de pagamento.
+  \item Bloqueio de funcionalidades por plano contratado no backend.
+\end{itemize}
+
+\subsection*{Fora de escopo}
+\begin{itemize}
+  \item Teleconsulta com vídeo em tempo real.
+  \item Financiamento de tratamento e análise de crédito.
+  \item Integração com maquininha de cartão.
+  \item Emissão fiscal completa (NFS-e) neste MVP.
+\end{itemize}
+
+\section{Fluxo Principal (Opcional)}
+\begin{figure}[htbp]
+  \centering
+  \MermaidTikzStyles
+  \resizebox{\MermaidMaxWidth}{!}{%
+    \begin{tikzpicture}[
+      node distance=8mm and 10mm,
+      >=Latex
+    ]
+      \node[term, small] (a) {Início};
+      \node[box, small, below=of a] (b) {Paciente acessa autoagendamento (RF-01)};
+      \node[box, small, below=of b] (c) {Seleciona profissional e horário};
+      \node[box, small, below=of c] (d) {Sistema valida disponibilidade e regras (RF-01)};
+      \node[decision, small, below=10mm of d] (e) {Horário disponível?};
+      \node[box, small, below left=11mm and 8mm of e] (f) {Exibir horários alternativos (RF-01)};
+      \node[decision, small, below=11mm of f] (g) {Paciente aceita alternativa?};
+      \node[box, small, below right=11mm and 8mm of e] (h) {Registrar consulta na agenda (RF-01)};
+      \node[box, small, below=of h] (i) {Enviar confirmação automática (RF-02)};
+      \node[box, small, below=of i] (j) {Atualizar status para confirmado (RF-02)};
+      \node[box, small, below=of j] (k) {Gerar cobrança Pix e baixar automaticamente (RF-04)};
+      \node[box, small, below left=11mm and 8mm of g] (l) {Encerrar tentativa sem agendamento};
+      \node[term, small, below=13mm of k] (m) {Fim};
+
+      \draw[line] (a) -- (b);
+      \draw[line] (b) -- (c);
+      \draw[line] (c) -- (d);
+      \draw[line] (d) -- (e);
+      \draw[line] (e) -- node[left, small] {Não} (f);
+      \draw[line] (e) -- node[right, small] {Sim} (h);
+      \draw[line] (f) -- (g);
+      \draw[line] (g) -- node[right, small] {Sim} (h);
+      \draw[line] (g) -- node[left, small] {Não} (l);
+      \draw[line] (h) -- (i);
+      \draw[line] (i) -- (j);
+      \draw[line] (j) -- (k);
+      \draw[line] (k) -- (m);
+      \draw[line] (l) |- (m);
+    \end{tikzpicture}%
+  }
+  \caption{Fluxo principal do autoagendamento até confirmação e cobrança no Odonto.}
+\end{figure}
+
+\section{Requisitos Funcionais Essenciais}
+\begin{itemize}
+  \item RF-01: O sistema deve permitir autoagendamento 24/7 com validação de disponibilidade por profissional e tipo de atendimento.
+  \item RF-02: O sistema deve enviar confirmação e lembretes automáticos por WhatsApp ou SMS e atualizar o status do agendamento conforme resposta do paciente.
+  \item RF-03: O sistema deve manter prontuário digital com evolução clínica e assinatura eletrônica de documentos obrigatórios.
+  \item RF-04: O sistema deve gerar cobrança Pix com QR Code/link e realizar baixa automática após confirmação do pagamento.
+  \item RF-05: O sistema deve aplicar bloqueio de funcionalidades por plano contratado no backend.
+\end{itemize}
+
+\section{Requisitos Não Funcionais Críticos}
+\begin{itemize}
+  \item RNF-01: Disponibilidade mensal mínima de 99,5\% para agenda, prontuário e cobrança.
+  \item RNF-02: Tempo de resposta menor que 2 segundos no percentil 95 para agenda e prontuário.
+  \item RNF-03: Segregação lógica de dados por empresa e clínica, com conformidade LGPD.
+\end{itemize}
+
+\section{Riscos e Incertezas}
+\begin{itemize}
+  \item Instabilidade de provedores de WhatsApp/SMS pode reduzir taxa de confirmação.
+  \item Divergências de configuração de agenda entre clínicas podem gerar conflitos de disponibilidade.
+  \item Falhas de integração com PSP podem afetar baixa automática do Pix.
+  \item Configuração incorreta de planos pode liberar funcionalidades indevidas.
+\end{itemize}
+
+\section{Critério de Sucesso}
+Em até 90 dias após a entrada em produção:
+\begin{itemize}
+  \item Redução de 20\% na taxa de não comparecimento em consultas elegíveis.
+  \item Pelo menos 80\% de confirmações elegíveis executadas de forma automática.
+  \item Pelo menos 90\% das cobranças Pix com baixa automática em até 5 minutos.
+\end{itemize}
+
+\section{Próximos Passos}
+\begin{itemize}
+  \item Fechar contratos de integração com provedores de WhatsApp/SMS e PSP de Pix.
+  \item Detalhar critérios de aceite de RF-02 e RF-04 com Produto, Engenharia e Financeiro.
+  \item Preparar levantamento técnico para etapa \texttt{Ready for Build}.
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,170 @@
+classDiagram
+    direction LR
+
+    class Empresa {
+      +UUID id
+      +string razaoSocial
+      +PlanoTipo planoAtual
+    }
+
+    class Unidade {
+      <<abstract>>
+      +UUID id
+      +string nome
+      +bool ativa
+    }
+
+    class Clinica {
+      +string cnpj
+      +string municipio
+    }
+
+    class Consultorio {
+      +string codigoInterno
+    }
+
+    Unidade <|-- Clinica
+    Unidade <|-- Consultorio
+    Empresa "1" --> "1..*" Unidade : possui
+
+    class Paciente {
+      +UUID id
+      +string cpf <<unique global>>
+      +string nome
+      +date dataNascimento
+    }
+
+    class PacienteClinica {
+      +UUID id
+      +string telefoneLocal
+      +string enderecoLocal
+      +string observacoesAdministrativas
+      +datetime atualizadoEm
+    }
+
+    Paciente "1" --> "0..*" PacienteClinica : vinculos
+    Clinica "1" --> "0..*" PacienteClinica : contexto local
+
+    class Dentista {
+      +UUID id
+      +string cro
+      +string nome
+    }
+
+    class VinculoDentistaClinica {
+      +UUID id
+      +string perfil
+      +bool ativo
+    }
+
+    Dentista "1" --> "0..*" VinculoDentistaClinica : atua em
+    Clinica "1" --> "0..*" VinculoDentistaClinica : possui equipe
+
+    class CadeiraSala {
+      +UUID id
+      +string nome
+      +string tipo
+    }
+
+    Clinica "1" --> "0..*" CadeiraSala : recursos
+
+    class Agendamento {
+      +UUID id
+      +datetime inicio
+      +datetime fim
+      +AgendamentoStatus status
+      +bool recorrente
+    }
+
+    PacienteClinica "1" --> "0..*" Agendamento : agenda de
+    VinculoDentistaClinica "1" --> "0..*" Agendamento : profissional
+    CadeiraSala "0..1" --> "0..*" Agendamento : alocacao
+
+    class Prontuario {
+      +UUID id
+      +string odontograma
+      +string anamnese
+      +string evolucaoClinica
+    }
+
+    PacienteClinica "1" --> "0..*" Prontuario : historico
+    VinculoDentistaClinica "1" --> "0..*" Prontuario : registra
+
+    class Documento {
+      +UUID id
+      +DocumentoTipo tipo
+      +AssinaturaStatus statusAssinatura
+      +string hashEvidencia
+      +string urlArquivo
+    }
+
+    Prontuario "0..1" --> "0..*" Documento : gera/anexa
+    PacienteClinica "1" --> "0..*" Documento : titular
+    Clinica "1" --> "0..*" Documento : emissora
+
+    class TituloFinanceiro {
+      +UUID id
+      +TituloTipo tipo
+      +decimal valor
+      +date vencimento
+      +TituloStatus status
+    }
+
+    class Pagamento {
+      +UUID id
+      +PagamentoMetodo metodo
+      +decimal valorPago
+      +datetime pagoEm
+    }
+
+    class CobrancaPix {
+      +string txid
+      +string qrCode
+      +string copiaECola
+    }
+
+    PacienteClinica "1" --> "0..*" TituloFinanceiro : contas
+    Empresa "1" --> "0..*" TituloFinanceiro : consolidacao
+    TituloFinanceiro "1" --> "0..*" Pagamento : liquidacao
+    Pagamento "0..1" --> "0..1" CobrancaPix : pix
+
+    class Plano {
+      +PlanoTipo tipo
+      +bool ativo
+    }
+
+    class Feature {
+      +string codigo
+      +string descricao
+    }
+
+    class LicenciamentoFeature {
+      +UUID id
+      +bool habilitada
+      +datetime avaliadoEm
+    }
+
+    Empresa "1" --> "1" Plano : contratado
+    Plano "1" --> "0..*" LicenciamentoFeature : regras
+    Feature "1" --> "0..*" LicenciamentoFeature : define
+    Empresa "1" --> "0..*" LicenciamentoFeature : avaliacao runtime
+
+    class EventoAuditoria {
+      +UUID id
+      +string tipoEvento
+      +string recurso
+      +datetime criadoEm
+      +UUID usuarioId
+    }
+
+    Empresa "1" --> "0..*" EventoAuditoria : trilha
+    Clinica "0..1" --> "0..*" EventoAuditoria : escopo unidade
+
+    class UsuarioPaciente {
+      +UUID id
+      +string email
+      +bool ativo
+    }
+
+    Paciente "1" --> "0..1" UsuarioPaciente : autenticacao portal
+    UsuarioPaciente ..> Documento : consulta/download permitido

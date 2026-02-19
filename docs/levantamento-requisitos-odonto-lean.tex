@@ -1,0 +1,150 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric}
+
+\geometry{margin=2.5cm}
+\setlist[itemize]{leftmargin=1.2cm}
+\setlist[enumerate]{leftmargin=1.2cm}
+
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+
+\input{../docs/requirements/mermaid-macros.tex}
+
+\title{Levantamento Lean de Requisitos\\Vitas Odonto}
+\author{Produto e Engenharia}
+\date{\today}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Contexto e Problema}
+No Odonto, agenda, confirmação, prontuário e fechamento de atendimento ainda operam com baixa integração de ponta a ponta.
+Esse cenário aumenta faltas, eleva retrabalho da recepção e alonga o tempo de conclusão administrativa por atendimento.
+
+\section{Objetivo do MVP}
+Validar um fluxo único para atendimento odontológico, do agendamento ao fechamento administrativo, com automação mínima para reduzir atrito operacional.
+
+Metas para até 90 dias após o go-live:
+\begin{itemize}
+  \item Reduzir em 20\% a taxa de não comparecimento em consultas elegíveis.
+  \item Atingir 80\% de confirmações automáticas por WhatsApp/SMS nas consultas elegíveis.
+  \item Atingir 90\% de fechamentos administrativos em até 5 minutos após conclusão clínica.
+\end{itemize}
+
+\section{Usuários e Stakeholders}
+\begin{itemize}
+  \item Paciente — precisa agendar e confirmar com rapidez.
+  \item Recepção — precisa reduzir confirmações e remarcações manuais.
+  \item Dentista — precisa registrar evolução clínica e documentos com segurança jurídica.
+  \item Administrativo — precisa reduzir esforço manual no encerramento de atendimentos.
+  \item Gestor da clínica — precisa monitorar eficiência operacional e uso por plano.
+\end{itemize}
+
+\section{Hipóteses}
+\begin{itemize}
+  \item Hipótese de valor: fluxo único reduz faltas e retrabalho operacional.
+  \item Hipótese de viabilidade: integrações com WhatsApp/SMS e automações de fluxo sustentam o MVP sem congelar arquitetura.
+\end{itemize}
+
+\section{Escopo Mínimo}
+\subsection*{Incluído}
+\begin{itemize}
+  \item Autoagendamento 24/7 por profissional e tipo de atendimento.
+  \item Confirmação e lembretes automáticos com atualização de status na agenda.
+  \item Prontuário odontológico digital com assinatura eletrônica de documentos essenciais.
+  \item Fechamento administrativo do atendimento sem dependência de validações externas.
+  \item Bloqueio de funcionalidades por plano no backend.
+\end{itemize}
+
+\subsection*{Fora de escopo}
+\begin{itemize}
+  \item Teleconsulta com vídeo.
+  \item Financiamento e análise de crédito.
+  \item Integração com maquininha de cartão.
+  \item Emissão fiscal completa (NFS-e) no MVP.
+\end{itemize}
+
+\section{Fluxo Principal (Opcional)}
+\begin{figure}[htbp]
+  \centering
+  \MermaidTikzStyles
+  \resizebox{\MermaidMaxWidth}{!}{%
+    \begin{tikzpicture}[node distance=8mm and 10mm,>=Latex]
+      \node[term, small] (a) {Início};
+      \node[box, small, below=of a] (b) {Paciente acessa autoagendamento (RF-01)};
+      \node[box, small, below=of b] (c) {Seleciona profissional e horário};
+      \node[decision, small, below=10mm of c] (d) {Horário disponível?};
+      \node[box, small, below left=10mm and 8mm of d] (e) {Exibir horários alternativos (RF-01)};
+      \node[decision, small, below=10mm of e] (f) {Paciente aceita alternativa?};
+      \node[box, small, below right=10mm and 8mm of d] (g) {Registrar consulta (RF-01)};
+      \node[box, small, below=of g] (h) {Enviar confirmação (RF-02)};
+      \node[box, small, below=of h] (i) {Registrar fechamento administrativo (RF-04)};
+      \node[box, small, below left=10mm and 8mm of f] (j) {Encerrar sem agendamento};
+      \node[term, small, below=12mm of i] (k) {Fim};
+
+      \draw[line] (a) -- (b);
+      \draw[line] (b) -- (c);
+      \draw[line] (c) -- (d);
+      \draw[line] (d) -- node[left, small] {Não} (e);
+      \draw[line] (d) -- node[right, small] {Sim} (g);
+      \draw[line] (e) -- (f);
+      \draw[line] (f) -- node[right, small] {Sim} (g);
+      \draw[line] (f) -- node[left, small] {Não} (j);
+      \draw[line] (g) -- (h);
+      \draw[line] (h) -- (i);
+      \draw[line] (i) -- (k);
+      \draw[line] (j) |- (k);
+    \end{tikzpicture}%
+  }
+  \caption{Fluxo principal de agendamento, confirmação e fechamento no Odonto.}
+\end{figure}
+
+\section{Requisitos Funcionais Essenciais}
+\begin{itemize}
+  \item RF-01: Permitir autoagendamento com validação de disponibilidade por profissional e tipo de atendimento.
+  \item RF-02: Enviar confirmação e lembretes por WhatsApp/SMS com atualização de status do agendamento.
+  \item RF-03: Manter prontuário digital com assinatura eletrônica de documentos obrigatórios.
+  \item RF-04: Registrar fechamento administrativo do atendimento sem depender de confirmações externas.
+  \item RF-05: Aplicar bloqueio de funcionalidades por plano contratado no backend.
+\end{itemize}
+
+\section{Requisitos Não Funcionais Críticos}
+\begin{itemize}
+  \item RNF-01: Disponibilidade mensal mínima de 99,5\% para agenda, prontuário e fechamento de atendimento.
+  \item RNF-02: Tempo de resposta menor que 2 segundos no percentil 95 para agenda e prontuário.
+  \item RNF-03: Segregação lógica de dados por empresa e clínica, com conformidade LGPD.
+\end{itemize}
+
+\section{Riscos e Incertezas}
+\begin{itemize}
+  \item Instabilidade de provedores de mensagem pode afetar confirmações.
+  \item Configurações de agenda heterogêneas podem gerar conflitos de disponibilidade.
+  \item Regras administrativas heterogêneas podem impactar o tempo de fechamento por clínica.
+\end{itemize}
+
+\section{Critério de Sucesso}
+Em até 90 dias após a entrada em produção:
+\begin{itemize}
+  \item Redução de 20\% na taxa de não comparecimento em consultas elegíveis.
+  \item Pelo menos 80\% das confirmações elegíveis executadas automaticamente.
+  \item Pelo menos 90\% dos atendimentos com fechamento administrativo em até 5 minutos.
+\end{itemize}
+
+\section{Próximos Passos}
+\begin{itemize}
+  \item Fechar contratos de integração com provedores de mensagem.
+  \item Detalhar critérios de aceite de RF-02 e RF-04.
+  \item Preparar PRD completo e levantamento técnico para \texttt{Ready for Build}.
+\end{itemize}
+
+\end{document}
